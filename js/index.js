@@ -1,104 +1,207 @@
-// function listarObjetos(array) {
-//     for (let i = 0; i < array.length; i++) {
-//         console.log(array[i]);
-//         let atualCard = array[i];
-       
-//     }
-    
-// }
-// listarObjetos(data)
+const shoppingCart = document.querySelector(".shopping-cart");
+const secaoVitrine = document.querySelector("#section1");
 
-const secaoVitrine = document.getElementById('#section1')
-const ulCard = document.createElement('ul');
-secaoVitrine.appendChild(ulCard)
+const ulCard = document.createElement("ul");
+const ulCart = document.createElement("ul");
 
-// FUNÇÃO DE CRIAR TEMPLATE (LI)
-function createTemplate(obj) {
-    li = document.createElement('li');
-    li.innerHTML = 
-        `<figure class="present-card">
-            <img src="${obj.img}" alt="${obj.nameItem}">
-        </figure>
-        <div class="info">
-            <button type="submit">${obj.tag}</button>
-            <h4>${obj.nameItem}</h4>
-            <p>${obj.description}</p>
-            <h4 class="value">R$ ${obj.value},00</h4>
-            <a href="">${obj.addCart}</a>
-        </div>`
-    return li;
+const totalContaiter = document.createElement("div");
+totalContaiter.className = "total-contaiter";
+
+const cartHead = document.createElement("div");
+cartHead.className = "cart-buy";
+
+const cartTitle = document.createElement("h2");
+cartTitle.innerText = "Carrinho de compras";
+
+const emptyCart = document.createElement("div");
+emptyCart.className = "empty-cart";
+
+const emptyH2 = document.createElement("h2");
+const emptyP = document.createElement("p");
+
+emptyH2.innerText = "Carrinho vazio!";
+emptyP.innerText = "Adicione ítens.";
+
+emptyCart.append(emptyH2, emptyP);
+ulCart.append(emptyCart);
+
+cartHead.appendChild(cartTitle);
+const cart = [];
+
+secaoVitrine.appendChild(ulCard);
+shoppingCart.append(cartHead, ulCart, totalContaiter);
+
+todos = document.querySelector(".todos");
+todos.addEventListener("click", (e) => {
+  e.preventDefault();
+  listarItens(ulCard, data, createTemplate);
+});
+
+departamentos = document.querySelectorAll(".departament");
+
+for (let i = 0; i < departamentos.length; i++) {
+  const element = departamentos[i];
+  element.addEventListener("click", (e) => {
+    e.preventDefault();
+    let filtered = data.filter((prod) => prod.tag[0] == element.innerText);
+    listarItens(ulCard, filtered, createTemplate);
+  });
 }
 
-//FUNCAO DE LISTAGEM
-function listarItens(array) {
-    for (let i = 0; i < array.length; i++) {
-        template = createTemplate(array[i]);
-        ulCard.appendChild(template);
+search = document.querySelector(".search");
+
+search.addEventListener("submit", (event) => {
+  event.preventDefault();
+  strigSearch = event.target.firstElementChild.value;
+  console.log(strigSearch);
+  let filtered = data.filter(
+    (prod) =>
+      prod.nameItem.toLowerCase().includes(strigSearch.toLowerCase()) ||
+      prod.description.toLowerCase().includes(strigSearch.toLowerCase()) ||
+      prod.tag[0].toLowerCase().includes(strigSearch.toLowerCase())
+  );
+  listarItens(ulCard, filtered, createTemplate);
+});
+
+const cartValueCreate = (array, tot) => {
+  totalCart = document.createElement("div");
+  totalCart.innerHTML = "";
+  totalCart.className = "total-cart";
+
+  totalQuantity = document.createElement("div");
+  totalQuantity.className = "quantity-cart";
+
+  quatityP = document.createElement("p");
+  quatityP.innerText = "Quantidade:";
+
+  quatitySpan = document.createElement("span");
+  quatitySpan.innerText = array.length;
+
+  totalQuantity.append(quatityP, quatitySpan);
+
+  totalValue = document.createElement("div");
+  totalValue.className = "total-value";
+
+  valueP = document.createElement("p");
+  valueP.innerText = "Total";
+
+  valueSpan = document.createElement("span");
+  valueSpan.innerText = `R$${tot.toFixed(2)}`;
+
+  totalValue.append(valueP, valueSpan);
+  totalCart.append(totalQuantity, totalValue);
+
+  return totalCart;
+};
+
+const cardCartCreate = (obj) => {
+  li = document.createElement("li");
+  li.className = "cart-card";
+
+  tagFigure = document.createElement("figure");
+
+  tagImg = document.createElement("img");
+  tagImg.src = obj.img;
+  tagImg.alt = obj.nameItem;
+
+  tagDiv = document.createElement("div");
+  tagDiv.className = "cart-card-info";
+
+  tagName = document.createElement("h4");
+  tagName.innerText = obj.nameItem;
+
+  tagPrice = document.createElement("span");
+  tagPrice.innerText = `R$ ${obj.value},00`;
+
+  tagA = document.createElement("a");
+  tagA.innerText = "Remover produto";
+
+  tagA.addEventListener("click", (event) => {
+    event.preventDefault();
+    objIndex = cart.indexOf(obj);
+    cart.splice(objIndex, 1);
+    if (cart.length > 0) {
+      somaValores(cart, totalContaiter);
+      listarItens(ulCart, cart, cardCartCreate);
+    } else {
+      totalContaiter.innerHTML = "";
+      ulCart.innerHTML = "";
+      ulCart.append(emptyCart);
     }
+  });
+
+  tagFigure.appendChild(tagImg);
+  tagDiv.append(tagName, tagPrice, tagA);
+  li.append(tagFigure, tagDiv);
+
+  return li;
+};
+
+const createTemplate = (obj) => {
+  li = document.createElement("li");
+  tagFigure = document.createElement("figure");
+  tagFigure.className = "present-card";
+
+  tagImg = document.createElement("img");
+  tagImg.src = obj.img;
+  tagImg.alt = obj.nameItem;
+
+  tagDiv = document.createElement("div");
+  tagDiv.className = "info";
+
+  tagButton = document.createElement("button");
+  tagButton.innerText = obj.tag[0];
+  tagButton.type = "submit";
+
+  tagButton.addEventListener("click", () => {
+    let filtered = data.filter((prod) => prod.tag[0] == obj.tag[0]);
+    listarItens(ulCard, filtered, createTemplate);
+  });
+
+  tagName = document.createElement("h4");
+  tagName.innerText = obj.nameItem;
+
+  tagPrice = document.createElement("h4");
+  tagPrice.className = "value";
+  tagPrice.innerText = `R$ ${obj.value},00`;
+
+  tagP = document.createElement("p");
+  tagP.innerText = obj.description;
+
+  tagA = document.createElement("a");
+  tagA.innerText = obj.addCart;
+
+  tagA.addEventListener("click", (event) => {
+    event.preventDefault();
+    cart.push(obj);
+    listarItens(ulCart, cart, cardCartCreate);
+    somaValores(cart, totalContaiter);
+  });
+
+  tagFigure.appendChild(tagImg);
+  tagDiv.append(tagButton, tagName, tagP, tagPrice, tagA);
+  li.append(tagFigure, tagDiv);
+
+  return li;
+};
+
+function listarItens(tagHTML, array, callback) {
+  tagHTML.innerHTML = "";
+
+  for (let i = 0; i < array.length; i++) {
+    template = callback(array[i]);
+    tagHTML.appendChild(template);
+  }
 }
-listarItens(data)
 
-//FUNCAO DE SOMA
-function somaValores(array) {
-    let total = 0;
-    for (let i = 0; i < array.length; i++) {
-        total = total + array[i].valor;
-    }
-    return total
+listarItens(ulCard, data, createTemplate);
+
+function somaValores(array, tagHTML) {
+  tagHTML.innerHTML = "";
+  let total = 0;
+  for (let i = 0; i < array.length; i++) {
+    total = total + array[i].value;
+  }
+  totalTag = cartValueCreate(array, total);
+  tagHTML.appendChild(totalTag);
 }
-
-{/* <ul>
-    <li>
-        <div class="present-card">
-            <img src="" alt="">
-            <button type="submit"></button>
-            <h3></h3>
-        </div>
-        <div class="info">
-            <p></p>
-            <p></p>
-            <button type="submit"></button>
-        </div>
-    </li>
-</ul> */}
-
-
-
-
-
-
-
-
-
-// <!-- Header
-// - Contém logo, menu de navegação;
-
-// Vitrine
-// - Contém os cards com suas respectivas informações;
-
-// Barra de pesquisa
-// - Contém um input para colocar texto e um botão para pesquisar
-
-// Carrinho de compras
-// - Posicionou os elementos corretamente;
-
-// Adicionar no site pelo menos 3 efeitos de hover
-// 1. Adicionado hover nos itens do menu;
-// 2. Adicionado hover no botão "adicionar ao carrinho"
-// 3. Adicionar hover o card de produto
-// Outro
-
-// Cards
-// - Contém as informações de título, foto, descrição, preço, tag de categoria e um botão de adicionar ao carrinho.
-
-// Estilização
-// - Contendo todos os itens como demostrado no template ou com base nele
-
-// Produtos gerados pelo DOM
-// - Contém as informações de título, foto, descrição, preço, tag de categoria e botões para adicionar e remover do carrinho
-
-// Carrinho de compras
-// - Deve ser possível adicionar produtos ao carrinho;
-
-// Carrinho de compras
-// - Deve ser possível remover produtos do carrinho -->
