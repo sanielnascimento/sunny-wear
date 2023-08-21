@@ -342,6 +342,10 @@ a:hover {
 }
 
 .cart-card-info h4 {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 16px;
     font-size: 14px;
 }
 
